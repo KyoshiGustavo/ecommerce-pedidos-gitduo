@@ -49,7 +49,8 @@ ecommerce-pedidos-gitduo/
 
 ## Como rodar o projeto
 
-...
+1. Clone o repositório.
+2. Abra o projeto na sua IDE Java (VS Code ou Eclipse/IntelliJ).
 
 ## Roadmap do projeto (por aula)
 
