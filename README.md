@@ -77,6 +77,7 @@ ecommerce-pedidos-gitduo/
 1. Manter a comunicação aberta e transparente entre os integrantes da squad.
 2. Dividir as tarefas de forma equilibrada e respeitar os prazos definidos.
 3. Não alterar ou sobrescrever código do colega sem alinhamento prévio via Git/GitHub.
+4. Conversar previamente alterações ou divergencias de ideia.
 
 ## Licença
 
