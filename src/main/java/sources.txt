@@ -1,0 +1,4 @@
+C:\Users\47715726826\ecommerce-pedidos-gitduo\src\main\java\com\senai\Aplicacao.java
+C:\Users\47715726826\ecommerce-pedidos-gitduo\src\main\java\com\senai\ecommerce\modelo\Cliente.java
+C:\Users\47715726826\ecommerce-pedidos-gitduo\src\main\java\com\senai\ecommerce\modelo\Produto.java
+C:\Users\47715726826\ecommerce-pedidos-gitduo\src\main\java\com\senai\ecommerce\util\PedidoUtils.java
