@@ -1,38 +1,53 @@
 package com.senai.ecommerce.modelo;
 
-import com.senai.ecommerce.util.PedidoUtils;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Pedido {
-    private String numero;
+    private Integer numero;
     private Cliente cliente;
-    private List<ItemPedido> itens;
+    private List<ItemPedido> itens = new ArrayList<>();
 
-    public Pedido(Cliente cliente) {
-        this.numero = PedidoUtils.gerarNumeroDoPedido();
+    public Pedido(Integer numero, Cliente cliente) {
+        if (numero == null || numero <= 0) {
+            throw new IllegalArgumentException("Número do pedido inválido.");
+        }
+        if (cliente == null) {
+            throw new IllegalArgumentException("Cliente é obrigatório.");
+        }
+        this.numero = numero;
         this.cliente = cliente;
-        this.itens = new ArrayList<>();
     }
 
-    public String getNumero() { return numero; }
-    public Cliente getCliente() { return cliente; }
-    public List<ItemPedido> getItens() { return itens; }
-
-    public void adicionarItem(ItemPedido item) {
-        itens.add(item);
+    public Integer getNumero() {
+        return numero;
     }
 
-    public double calcularValorTotal() {
-        double total = 0.0;
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public List<ItemPedido> getItens() {
+        return Collections.unmodifiableList(itens);
+    }
+
+    public void adicionarItem(Produto produto, int quantidade) {
+        produto.baixarEstoque(quantidade);
+        this.itens.add(new ItemPedido(produto, quantidade));
+    }
+
+    public BigDecimal getTotal() {
+        BigDecimal total = BigDecimal.ZERO;
         for (ItemPedido item : itens) {
-            total += item.calcularSubtotal();
+            total = total.add(item.getSubtotal());
         }
         return total;
     }
 
     @Override
     public String toString() {
-        return String.format("Pedido %s - Cliente: %s - Total: R$ %.2f", numero, cliente.getNome(), calcularValorTotal());
+        return "Pedido #" + numero + " - Cliente: " + cliente.getNome() + " - Total: R$ " + getTotal();
     }
 }

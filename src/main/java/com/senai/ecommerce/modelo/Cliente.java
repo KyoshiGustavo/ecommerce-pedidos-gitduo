@@ -1,32 +1,31 @@
 package com.senai.ecommerce.modelo;
 
-public class Cliente {
-    private Long id;
-    private String nome;
-    private String cpf;
+public class Cliente extends Pessoa {
     private String email;
-    private String telefone;
 
-    public Cliente(Long id, String nome, String cpf, String email, String telefone) {
-        this.id = id;
-        this.nome = nome;
-        this.cpf = cpf;
-        this.email = email;
-        this.telefone = telefone;
+    public Cliente(String nome, String documento, String email) {
+        super(nome, documento);
+        setEmail(email);
     }
 
-    public Long getId() { return id; }
-    public String getNome() { return nome; }
-    public String getCpf() { return cpf; }
-    public String getEmail() { return email; }
-    public String getTelefone() { return telefone; }
+    public String getEmail() {
+        return email;
+    }
 
+    public void setEmail(String email) {
+        if (email == null || !email.contains("@")) {
+            throw new IllegalArgumentException("E-mail inválido.");
+        }
+        this.email = email.trim();
+    }
+
+    @Override
     public String getIdentificacao() {
-        return String.format("%s (CPF: %s)", nome, cpf);
+        return getNome() + " (CPF/CNPJ: " + getDocumento() + ")";
     }
 
     @Override
     public String toString() {
-        return getIdentificacao();
+        return "Cliente: " + getIdentificacao() + " | Email: " + email;
     }
 }
