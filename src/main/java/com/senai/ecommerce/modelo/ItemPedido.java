@@ -1,14 +1,19 @@
 package com.senai.ecommerce.modelo;
 
+import java.math.BigDecimal;
+
 public class ItemPedido {
     private Produto produto;
     private int quantidade;
-    private double precoPraticado; // Regra de negócio: grava o preço no momento da compra
+    private BigDecimal precoPraticado;
 
     public ItemPedido(Produto produto, int quantidade) {
+        if (produto == null) {
+            throw new IllegalArgumentException("Produto é obrigatório.");
+        }
         this.produto = produto;
-        this.quantidade = quantidade;
-        this.precoPraticado = produto.getPreco(); // Pega o preço atual do produto
+        setQuantidade(quantidade);
+        this.precoPraticado = produto.getPreco();
     }
 
     public Produto getProduto() {
@@ -20,20 +25,22 @@ public class ItemPedido {
     }
 
     public void setQuantidade(int quantidade) {
+        if (quantidade <= 0) {
+            throw new IllegalArgumentException("Quantidade do item deve ser maior que zero.");
+        }
         this.quantidade = quantidade;
     }
 
-    public double getPrecoPraticado() {
+    public BigDecimal getPrecoPraticado() {
         return precoPraticado;
     }
 
-    // Método de negócio
-    public double calcularSubtotal() {
-        return precoPraticado * quantidade;
+    public BigDecimal getSubtotal() {
+        return precoPraticado.multiply(BigDecimal.valueOf(quantidade));
     }
 
     @Override
     public String toString() {
-        return String.format("%s x %d = R$ %.2f", produto.getNome(), quantidade, calcularSubtotal());
+        return produto.getNome() + " x " + quantidade + " = R$ " + getSubtotal();
     }
 }
