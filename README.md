@@ -87,3 +87,13 @@ Projeto acadêmico — Faculdade de Tecnologia SENAI "Antonio Adolpho Lobbe".
 ## Decisões de Modelagem (Aula 07)
 
 - **Tratamento de produtos repetidos:** Decidimos somar a quantidade no item existente caso o mesmo produto seja adicionado mais de uma vez ao pedido, mantendo o recibo do pedido organizado e sem linhas duplicadas.
+
+## Entrega Aula 08 — Módulo de Pagamento Polimórfico
+
+- **Interface criada:** `ProcessadorPagamento` (`processar`, `getComprovante`, `getDescricao`).
+- **Formas implementadas:** `Pix`, `Boleto`, `CartaoCredito` e `Dinheiro`.
+- **Prova da Extensão (Aberto/Fechado):** 
+  - **Novos arquivos adicionados:** `Dinheiro.java`.
+  - **Arquivos existentes alterados para adicionar a 4ª forma:** **0 (zero)**[cite: 8, 12].
+  - **Conclusão:** O método `pagar` na classe `Pedido` opera apenas sobre a interface `ProcessadorPagamento`, sem nenhum `instanceof` ou verificação de tipo concreta[cite: 8, 10, 12].
+- **Critério de Exceção vs. Retorno False:** Retorna `false` para situações de negócio previstas (ex: saldo insuficiente) e lança `IllegalArgumentException`/`IllegalStateException` para erros de uso e estado inválido do objeto[cite: 10, 12].
