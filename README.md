@@ -83,3 +83,7 @@ ecommerce-pedidos-gitduo/
 ## Licença
 
 Projeto acadêmico — Faculdade de Tecnologia SENAI "Antonio Adolpho Lobbe".
+
+## Decisões de Modelagem (Aula 07)
+
+- **Tratamento de produtos repetidos:** Decidimos somar a quantidade no item existente caso o mesmo produto seja adicionado mais de uma vez ao pedido, mantendo o recibo do pedido organizado e sem linhas duplicadas.
