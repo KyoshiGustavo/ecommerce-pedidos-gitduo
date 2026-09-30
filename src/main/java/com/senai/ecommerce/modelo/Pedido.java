@@ -1,5 +1,7 @@
 package com.senai.ecommerce.modelo;
 
+import com.senai.ecommerce.excecao.EstoqueInsuficienteException;
+import com.senai.ecommerce.excecao.PagamentoRecusadoException;
 import com.senai.ecommerce.modelo.pagamento.ProcessadorPagamento;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -44,18 +46,21 @@ public class Pedido {
         return comprovante;
     }
 
-    // Sobrecarga exigida na aula: a versão simples delega para a completa
-    public void adicionarItem(Produto produto) {
+    public void adicionarItem(Produto produto) throws EstoqueInsuficienteException {
         adicionarItem(produto, 1);
     }
 
-    public void adicionarItem(Produto produto, int quantidade) {
+    public void adicionarItem(Produto produto, int quantidade) throws EstoqueInsuficienteException {
         if (produto == null) {
             throw new IllegalArgumentException("Produto não pode ser nulo.");
         }
         if (quantidade <= 0) {
             throw new IllegalArgumentException("Quantidade deve ser maior que zero.");
         }
+        if ("PAGO".equals(this.status)) {
+            throw new IllegalStateException("Não é possível adicionar itens a um pedido já pago.");
+        }
+
         produto.baixarEstoque(quantidade);
         this.itens.add(new ItemPedido(produto, quantidade));
     }
@@ -68,21 +73,25 @@ public class Pedido {
         return total;
     }
 
-    // Método de pagamento polimórfico sem citar nenhuma classe concreta
-    public boolean pagar(ProcessadorPagamento processador) {
+    public boolean pagar(ProcessadorPagamento processador) throws PagamentoRecusadoException {
         if (processador == null) {
             throw new IllegalArgumentException("Forma de pagamento é obrigatória.");
         }
         if (itens.isEmpty()) {
             throw new IllegalStateException("Pedido sem itens não pode ser pago.");
         }
+        if ("PAGO".equals(this.status)) {
+            throw new IllegalStateException("Pedido já se encontra pago.");
+        }
 
         boolean aprovado = processador.processar(getTotal());
-        if (aprovado) {
-            this.status = "PAGO";
-            this.comprovante = processador.getComprovante();
+        if (!aprovado) {
+            throw new PagamentoRecusadoException(processador.getDescricao(), "Transação não autorizada");
         }
-        return aprovado;
+
+        this.status = "PAGO";
+        this.comprovante = processador.getComprovante();
+        return true;
     }
 
     @Override

@@ -1,35 +1,29 @@
 package com.senai.ecommerce.modelo.pagamento;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
-public abstract class FormaPagamento {
-    private BigDecimal valor;
-    private LocalDateTime dataDoPagamento;
+public abstract class FormaPagamento implements ProcessadorPagamento {
+    private String descricao;
+    private String comprovante;
 
-    protected FormaPagamento(BigDecimal valor) {
-        setValor(valor);
-        this.dataDoPagamento = LocalDateTime.now();
+    public FormaPagamento(String descricao) {
+        this.descricao = descricao;
     }
 
-    public BigDecimal getValor() {
-        return valor;
+    @Override
+    public String getDescricao() {
+        return descricao;
     }
 
-    public void setValor(BigDecimal valor) {
-        if (valor == null || valor.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Valor do pagamento deve ser positivo");
-        }
-        this.valor = valor;
+    @Override
+    public String getComprovante() {
+        return comprovante;
     }
 
-    public LocalDateTime getDataDoPagamento() {
-        return dataDoPagamento;
+    protected void setComprovante(String comprovante) {
+        this.comprovante = comprovante;
     }
 
-    public abstract boolean processar();
-
-    public String getResumo() {
-        return String.format("%s no valor de R$ %s", getClass().getSimpleName(), valor);
-    }
+    @Override
+    public abstract boolean processar(BigDecimal valor);
 }

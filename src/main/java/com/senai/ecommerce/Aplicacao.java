@@ -1,56 +1,34 @@
 package com.senai.ecommerce;
 
+import com.senai.ecommerce.excecao.EstoqueInsuficienteException;
 import com.senai.ecommerce.modelo.Cliente;
-import com.senai.ecommerce.modelo.ItemPedido;
 import com.senai.ecommerce.modelo.Pedido;
 import com.senai.ecommerce.modelo.Produto;
+import java.math.BigDecimal;
 
 public class Aplicacao {
-
     public static void main(String[] args) {
-        System.out.println("=== TESTE POO - E-COMMERCE DE PEDIDOS ===\n");
+        try {
+            Cliente cliente = new Cliente("João Silva", "joao@email.com", "123.456.789-00");
+            Produto notebook = new Produto("Notebook", new BigDecimal("3500.00"), 3);
 
-        // 1. Criando Cliente
-        Cliente cliente1 = new Cliente(1L, "João Silva", "123.456.789-00", "joao@email.com", "(16) 99999-8888");
-        System.out.println("Cliente cadastrado: " + cliente1.getIdentificacao());
+            Pedido pedido = new Pedido(1, cliente);
 
-        // 2. Criando Produtos
-        Produto p1 = new Produto("P001", "Teclado Mecânico", "Teclado RGB Switch Blue", 250.00, 10);
-        Produto p2 = new Produto("P002", "Mouse Gamer", "Mouse 10000 DPI", 120.00, 15);
+            System.out.println("--- Tentando adicionar 2 notebooks (Estoque: 3) ---");
+            pedido.adicionarItem(notebook, 2);
+            System.out.println("Item adicionado com sucesso! Estoque restante: " + notebook.getQuantidadeEmEstoque());
 
-        System.out.println("\n--- Produtos Disponíveis ---");
-        System.out.println(p1);
-        System.out.println(p2);
+            System.out.println("\n--- Tentando adicionar + 5 notebooks (Ultrapassa estoque) ---");
+            pedido.adicionarItem(notebook, 5);
 
-        // 3. Criando Pedido para o Cliente
-        Pedido pedido = new Pedido(cliente1);
-
-        // 4. Adicionando Itens ao Pedido
-        if (p1.temEstoqueDisponivel(2)) {
-            ItemPedido item1 = new ItemPedido(p1, 2);
-            pedido.adicionarItem(item1);
-            p1.baixarEstoque(2);
+        } catch (EstoqueInsuficienteException e) {
+            System.out.println("Erro de Negócio Capturado: " + e.getMessage());
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            System.out.println("Erro de Validação: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Erro inesperado: " + e.getMessage());
         }
 
-        if (p2.temEstoqueDisponivel(1)) {
-            ItemPedido item2 = new ItemPedido(p2, 1);
-            pedido.adicionarItem(item2);
-            p2.baixarEstoque(1);
-        }
-
-        // 5. Exibindo resumo do Pedido
-        System.out.println("\n--- Resumo do Pedido ---");
-        System.out.println("Número do Pedido: " + pedido.getNumero());
-        System.out.println("Cliente: " + pedido.getCliente().getNome());
-        System.out.println("Itens do Pedido:");
-        for (ItemPedido item : pedido.getItens()) {
-            System.out.println(" - " + item);
-        }
-        System.out.printf("VALOR TOTAL: R$ %.2f\n", pedido.calcularValorTotal());
-
-        // 6. Verificando estoque atualizado
-        System.out.println("\n--- Estoque Após a Compra ---");
-        System.out.println(p1);
-        System.out.println(p2);
+        System.out.println("\n--- O programa continuou executando normalmente sem fechar! ---");
     }
 }

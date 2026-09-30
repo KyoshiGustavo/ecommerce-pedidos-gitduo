@@ -1,32 +1,16 @@
 package com.senai.ecommerce.modelo.pagamento;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.util.UUID;
 
-public class Boleto extends FormaPagamento implements ProcessadorPagamento {
-    private final LocalDate vencimento;
-
-    public Boleto(BigDecimal valor, LocalDate vencimento) {
-        super(valor);
-        if (vencimento == null || vencimento.isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("Data de vencimento inválida");
-        }
-        this.vencimento = vencimento;
+public class Boleto extends FormaPagamento {
+    public Boleto() {
+        super("Boleto Bancário");
     }
 
     @Override
     public boolean processar(BigDecimal valor) {
-        System.out.println("Gerando boleto com vencimento em " + vencimento);
+        setComprovante("BOL-" + UUID.randomUUID().toString().substring(0, 8));
         return true;
-    }
-
-    @Override
-    public String getComprovante() {
-        return "BOL-" + System.currentTimeMillis();
-    }
-
-    @Override
-    public String getDescricao() {
-        return "Boleto - vencimento: " + vencimento;
     }
 }
