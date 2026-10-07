@@ -44,4 +44,10 @@ public class Produto {
         }
         this.quantidadeEmEstoque -= quantidade;
     }
+    public void reporEstoque(int quantidade) {
+    if (quantidade <= 0) {
+        throw new IllegalArgumentException("A quantidade a repor deve ser maior que zero.");
+    }
+    this.quantidadeEmEstoque += quantidade;
+}
 }
