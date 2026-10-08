@@ -39,4 +39,6 @@ export function Navbar() {
       </nav>
     </header>
   );
-}
+}git add .
+git commit -m "feat: adiciona componente Navbar e ajusta estrutura do frontend"
+git push origin feature/testes-unitarios
