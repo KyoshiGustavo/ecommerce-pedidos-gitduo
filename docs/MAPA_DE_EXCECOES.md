@@ -175,19 +175,6 @@ Equipe visitante: ______________________________
 
 ---
 
-## Parte 7 — Fica para a Aula 10
+## Parte 7 — Testes da Aula 10
 
-Cada linha da Parte 3 vira um método de teste. Já existem na suíte (ver `src/test/java`):
-
-- [x] `ProdutoTest.deveLancarExcecaoQuandoEstoqueInsuficiente()`
-- [x] `ProdutoTest.deveRecusarPrecoInvalido()` (negativo e zero)
-- [x] `PedidoTest.deveRecusarPagamentoDePedidoSemItens()`
-- [x] `PedidoTest.deveManterPedidoAbertoQuandoPagamentoRecusado()`
-- [x] `PedidoTest.deveSomarTotalComDoisItens()` _(caminho feliz)_
-- [x] `PedidoTest.deveImpedirPagamentoDuplicado()`, `deveRecusarItemEmPedidoPago()`, `deveRecusarValorDivergente()`, `deveRecusarProcessadorNulo()`
-- [x] `ValidadorTest` (e-mail e documento: válidos e inválidos)
-- [x] `ServicosTest` (duplicados, cliente/pedido não encontrado)
-- [x] `CenariosDeErroTest` (executa os 24 cenários deste mapa)
-- [ ] _(continue a lista na Aula 10: `assertThrows` por linha da Parte 3, um método por cenário)_
-
-> A Aula 10 começa exatamente aqui. Quanto mais completa esta lista, mais rápido a suíte de testes fica pronta.
+A Parte 2 do [Plano de Testes Unitários](PLANO_DE_TESTES_AULA_10.md#parte-2--cenários-do-mapa-de-exceções-da-aula-09) relaciona cada cenário deste mapa com a classe e o método que o verifica. A suíte também mantém `CenariosDeErroTest` para conferir o resultado agregado dos 24 cenários do console.

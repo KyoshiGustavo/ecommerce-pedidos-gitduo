@@ -133,3 +133,18 @@ Documentos: [`docs/MAPA_DE_EXCECOES.md`](docs/MAPA_DE_EXCECOES.md) (mapa preench
 **Atualização da decisão da Aula 08:** pedido sem itens, pedido já pago e item em pedido pago passam a lançar `PedidoInvalidoException` (situação de negócio, checked), em vez de `IllegalStateException`, conforme o Roteiro Prático da Aula 09. `IllegalStateException` fica para estado inconsistente do próprio objeto/recurso.
 
 **Requisitos desejáveis atendidos:** encadeamento de causa (`NumberFormatException` traduzida preservando a causa), try-with-resources (`Scanner`), multi-catch, classe utilitária `Validador` (inclui validação de dígitos de CPF/CNPJ) e mensagens centralizadas em `Mensagens`.
+
+
+## Entrega Aula 10 — Testes unitários
+
+Requer JDK 17 ou superior e Maven. Abra a pasta que contém o `pom.xml` e execute:
+
+```bash
+mvn clean test
+```
+
+Para rodar apenas `ProdutoTest`, use `mvn test -Dtest=ProdutoTest`. O Surefire grava os resultados em `target/surefire-reports`.
+
+- [Plano de testes](docs/PLANO_DE_TESTES_AULA_10.md)
+- [Checklist preenchido](docs/CHECKLIST_TESTES_UNITARIOS_AULA_10.pdf)
+- [Relatório de execução](docs/RELATORIO_EXECUCAO_AULA_10.txt)

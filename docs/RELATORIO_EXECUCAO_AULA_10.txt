@@ -1,0 +1,58 @@
+AULA 10 — RELATÓRIO DE EXECUÇÃO
+Gustavo Kyoshi e João Miranda · 24/11/2026
+
+Configuração
+  Java 21.0.13, compilação com alvo Java 17
+  Maven 3.9.9, JUnit 5.10.2, Surefire 3.2.5
+
+Projeto original
+  Tests run: 60, Failures: 0, Errors: 0, Skipped: 0
+
+Execução final — mvn clean test
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.086 s -- in com.senai.ecommerce.servico.ClienteServicoTest
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.013 s -- in com.senai.ecommerce.servico.ProdutoServicoTest
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.010 s -- in com.senai.ecommerce.servico.PedidoServicoTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.041 s -- in com.senai.ecommerce.apresentacao.CenariosDeErroTest
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in com.senai.ecommerce.modelo.FuncionarioTest
+Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.021 s -- in com.senai.ecommerce.modelo.ProdutoTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in com.senai.ecommerce.modelo.PedidoTest$PedidoPago
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in com.senai.ecommerce.modelo.PedidoTest$Pagamento
+Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s -- in com.senai.ecommerce.modelo.PedidoTest$PedidoEmAberto
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.027 s -- in com.senai.ecommerce.modelo.PedidoTest
+Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in com.senai.ecommerce.modelo.ClienteTest
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in com.senai.ecommerce.modelo.ItemPedidoTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in com.senai.ecommerce.modelo.pagamento.ProcessadorPagamentoTest
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in com.senai.ecommerce.modelo.pagamento.DinheiroTest
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in com.senai.ecommerce.modelo.pagamento.CartaoCreditoTest
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in com.senai.ecommerce.modelo.pagamento.PixTest
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in com.senai.ecommerce.modelo.pagamento.BoletoTest
+Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.023 s -- in com.senai.ecommerce.util.PedidoUtilsTest
+Tests run: 26, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.017 s -- in com.senai.ecommerce.util.ValidadorTest
+Tests run: 127, Failures: 0, Errors: 0, Skipped: 0
+BUILD SUCCESS
+Total time:  2.143 s
+
+Diferença em relação ao projeto original: 67 execuções a mais.
+Os totais incluem cada invocação parametrizada.
+A bateria de console da Aula 09 também foi executada: 24 de 24 cenários
+conforme o esperado. Na suíte Maven, a bateria é uma verificação agregada.
+
+Independência
+Ordem aleatória (semente 24112026): 127 aprovados.
+Execução isolada por identificador JUnit: 127 aprovados.
+
+Cobertura de linhas (JaCoCo 0.8.12, agente externo)
+Domínio: 142 de 150 linhas (94,67%).
+Java completo: 411 de 641 linhas (64,12%).
+A cobertura detalhada por classe consta no plano de testes.
+
+TDD — ProdutoTest#devePreservarEstoqueQuandoReposicaoExcedeLimite
+RED: Expected java.lang.IllegalArgumentException to be thrown, but nothing was thrown.
+GREEN: 1 teste executado e aprovado após validar a reposição antes da soma.
+A suíte inteira permaneceu verde após a centralização da mensagem.
+
+Demonstrações do roteiro (cópia de trabalho separada)
+Valor esperado alterado de 3 para 4:
+  expected: <4> but was: <3>
+Validação de estoque insuficiente removida temporariamente:
+  Expected com.senai.ecommerce.excecao.EstoqueInsuficienteException to be thrown, but nothing was thrown.
