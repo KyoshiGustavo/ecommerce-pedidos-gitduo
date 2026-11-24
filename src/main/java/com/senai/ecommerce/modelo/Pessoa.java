@@ -1,5 +1,7 @@
 package com.senai.ecommerce.modelo;
 
+import com.senai.ecommerce.util.Validador;
+
 public abstract class Pessoa {
     private String nome;
     private String documento;
@@ -14,10 +16,7 @@ public abstract class Pessoa {
     }
 
     public void setNome(String nome) {
-        if (nome == null || nome.isBlank()) {
-            throw new IllegalArgumentException("Nome é obrigatório.");
-        }
-        this.nome = nome.trim();
+        this.nome = Validador.textoObrigatorio(nome, "Nome");
     }
 
     public String getDocumento() {
@@ -25,10 +24,7 @@ public abstract class Pessoa {
     }
 
     public void setDocumento(String documento) {
-        if (documento == null || documento.isBlank()) {
-            throw new IllegalArgumentException("Documento é obrigatório.");
-        }
-        this.documento = documento.trim();
+        this.documento = Validador.documentoValido(documento);
     }
 
     public abstract String getIdentificacao();

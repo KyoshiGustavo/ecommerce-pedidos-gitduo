@@ -1,6 +1,7 @@
 package com.senai.ecommerce.modelo;
 
 import com.senai.ecommerce.excecao.EstoqueInsuficienteException;
+import com.senai.ecommerce.util.Validador;
 import java.math.BigDecimal;
 
 public class Produto {
@@ -9,18 +10,9 @@ public class Produto {
     private int quantidadeEmEstoque;
 
     public Produto(String nome, BigDecimal preco, int quantidadeEmEstoque) {
-        if (nome == null || nome.isBlank()) {
-            throw new IllegalArgumentException("Nome do produto é obrigatório.");
-        }
-        if (preco == null || preco.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Preço deve ser maior que zero.");
-        }
-        if (quantidadeEmEstoque < 0) {
-            throw new IllegalArgumentException("Estoque não pode ser negativo.");
-        }
-        this.nome = nome;
-        this.preco = preco;
-        this.quantidadeEmEstoque = quantidadeEmEstoque;
+        this.nome = Validador.textoObrigatorio(nome, "Nome do produto");
+        this.preco = Validador.valorPositivo(preco, "Preço");
+        this.quantidadeEmEstoque = Validador.estoqueNaoNegativo(quantidadeEmEstoque, "Estoque");
     }
 
     public String getNome() {
@@ -35,19 +27,26 @@ public class Produto {
         return quantidadeEmEstoque;
     }
 
+    /**
+     * Detecta e lança; quem decide o que fazer é a camada de cima.
+     * Quantidade inválida é defeito de quem chamou (unchecked);
+     * estoque insuficiente é situação de negócio prevista (checked).
+     */
     public void baixarEstoque(int quantidade) throws EstoqueInsuficienteException {
-        if (quantidade <= 0) {
-            throw new IllegalArgumentException("Quantidade deve ser maior que zero.");
-        }
+        Validador.quantidadePositiva(quantidade, "Quantidade");
         if (quantidade > this.quantidadeEmEstoque) {
             throw new EstoqueInsuficienteException(this, quantidade);
         }
         this.quantidadeEmEstoque -= quantidade;
     }
+
     public void reporEstoque(int quantidade) {
-    if (quantidade <= 0) {
-        throw new IllegalArgumentException("A quantidade a repor deve ser maior que zero.");
+        Validador.quantidadePositiva(quantidade, "Quantidade a repor");
+        this.quantidadeEmEstoque += quantidade;
     }
-    this.quantidadeEmEstoque += quantidade;
-}
+
+    @Override
+    public String toString() {
+        return nome + " — R$ " + preco.toPlainString() + " — estoque: " + quantidadeEmEstoque;
+    }
 }

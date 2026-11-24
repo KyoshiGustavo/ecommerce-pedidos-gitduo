@@ -1,5 +1,7 @@
 package com.senai.ecommerce.modelo;
 
+import com.senai.ecommerce.util.Validador;
+
 public class Funcionario extends Pessoa {
     private String matricula;
     private String cargo;
@@ -15,10 +17,7 @@ public class Funcionario extends Pessoa {
     }
 
     public void setMatricula(String matricula) {
-        if (matricula == null || matricula.isBlank()) {
-            throw new IllegalArgumentException("Matrícula é obrigatória");
-        }
-        this.matricula = matricula;
+        this.matricula = Validador.textoObrigatorio(matricula, "Matrícula");
     }
 
     public String getCargo() {
@@ -26,10 +25,7 @@ public class Funcionario extends Pessoa {
     }
 
     public void setCargo(String cargo) {
-        if (cargo == null || cargo.isBlank()) {
-            throw new IllegalArgumentException("Cargo é obrigatório");
-        }
-        this.cargo = cargo;
+        this.cargo = Validador.textoObrigatorio(cargo, "Cargo");
     }
 
     @Override

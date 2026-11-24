@@ -32,7 +32,7 @@ class ProdutoTest {
 
     @Test
     @DisplayName("Deve baixar o estoque quando há quantidade suficiente")
-    void deveBaixarEstoqueQuandoHaQuantidadeSuficiente() {
+    void deveBaixarEstoqueQuandoHaQuantidadeSuficiente() throws EstoqueInsuficienteException {
         notebook.baixarEstoque(2);
         assertEquals(3, notebook.getQuantidadeEmEstoque());
     }
@@ -45,7 +45,7 @@ class ProdutoTest {
     }
 
     @Test
-    @DisplayName("Deve lançar exceção e manter estado inalterado quando estoque for insuficiente")
+    @DisplayName("Deve lançar exceção com dados de negócio e manter estado inalterado quando estoque for insuficiente")
     void deveLancarExcecaoQuandoEstoqueInsuficiente() {
         EstoqueInsuficienteException erro = assertThrows(
             EstoqueInsuficienteException.class,
@@ -54,17 +54,43 @@ class ProdutoTest {
 
         assertAll("Verificação da exceção e estado inalterado",
             () -> assertTrue(erro.getMessage().contains("Notebook")),
+            () -> assertSame(notebook, erro.getProduto()),
+            () -> assertEquals(50, erro.getQuantidadeSolicitada()),
+            () -> assertEquals(5, erro.getQuantidadeDisponivel()),
             () -> assertEquals(5, notebook.getQuantidadeEmEstoque())
         );
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"-0.01", "-10.00", "-500.00"})
-    @DisplayName("Deve recusar criação de produto com preços negativos")
-    void deveRecusarPrecoNegativo(String precoInvalido) {
+    @ValueSource(strings = {"-0.01", "-10.00", "-500.00", "0"})
+    @DisplayName("Deve recusar criação de produto com preço negativo ou zero")
+    void deveRecusarPrecoInvalido(String precoInvalido) {
         assertThrows(
             IllegalArgumentException.class,
             () -> new Produto("Teclado", new BigDecimal(precoInvalido), 5)
         );
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "   "})
+    @DisplayName("Deve recusar produto com nome vazio")
+    void deveRecusarNomeVazio(String nomeInvalido) {
+        assertThrows(IllegalArgumentException.class,
+            () -> new Produto(nomeInvalido, new BigDecimal("10.00"), 5));
+    }
+
+    @Test
+    @DisplayName("Deve recusar estoque negativo na criação")
+    void deveRecusarEstoqueNegativo() {
+        assertThrows(IllegalArgumentException.class,
+            () -> new Produto("Teclado", new BigDecimal("10.00"), -1));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, -1})
+    @DisplayName("Deve recusar baixa de estoque com quantidade zero ou negativa (defeito de quem chamou)")
+    void deveRecusarBaixaComQuantidadeInvalida(int quantidade) {
+        assertThrows(IllegalArgumentException.class, () -> notebook.baixarEstoque(quantidade));
+        assertEquals(5, notebook.getQuantidadeEmEstoque());
     }
 }

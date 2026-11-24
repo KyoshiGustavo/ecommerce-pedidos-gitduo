@@ -1,34 +1,30 @@
 package com.senai.ecommerce;
 
-import com.senai.ecommerce.excecao.EstoqueInsuficienteException;
-import com.senai.ecommerce.modelo.Cliente;
-import com.senai.ecommerce.modelo.Pedido;
-import com.senai.ecommerce.modelo.Produto;
-import java.math.BigDecimal;
+import com.senai.ecommerce.apresentacao.CenariosDeErro;
+import com.senai.ecommerce.apresentacao.MenuConsole;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
+/**
+ * Ponto de entrada.
+ *
+ *   (sem argumentos)   menu interativo de console
+ *   --cenarios         executa a bateria de cenários de erro e imprime previsto x obtido
+ *   --cenarios-md      idem, em linhas de tabela Markdown (para preencher o Mapa de Exceções)
+ */
 public class Aplicacao {
     public static void main(String[] args) {
-        try {
-            Cliente cliente = new Cliente("João Silva", "joao@email.com", "123.456.789-00");
-            Produto notebook = new Produto("Notebook", new BigDecimal("3500.00"), 3);
-
-            Pedido pedido = new Pedido(1, cliente);
-
-            System.out.println("--- Tentando adicionar 2 notebooks (Estoque: 3) ---");
-            pedido.adicionarItem(notebook, 2);
-            System.out.println("Item adicionado com sucesso! Estoque restante: " + notebook.getQuantidadeEmEstoque());
-
-            System.out.println("\n--- Tentando adicionar + 5 notebooks (Ultrapassa estoque) ---");
-            pedido.adicionarItem(notebook, 5);
-
-        } catch (EstoqueInsuficienteException e) {
-            System.out.println("Erro de Negócio Capturado: " + e.getMessage());
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            System.out.println("Erro de Validação: " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("Erro inesperado: " + e.getMessage());
+        if (args.length > 0 && "--cenarios".equals(args[0])) {
+            boolean todosOk = new CenariosDeErro().executarEImprimir(System.out);
+            System.exit(todosOk ? 0 : 1);
+        } else if (args.length > 0 && "--cenarios-md".equals(args[0])) {
+            new CenariosDeErro().imprimirMarkdown(System.out);
+            return;
         }
 
-        System.out.println("\n--- O programa continuou executando normalmente sem fechar! ---");
+        // try-with-resources: o Scanner é fechado aconteça o que acontecer.
+        try (Scanner entrada = new Scanner(System.in, StandardCharsets.UTF_8)) {
+            new MenuConsole(entrada, System.out).iniciar();
+        }
     }
 }

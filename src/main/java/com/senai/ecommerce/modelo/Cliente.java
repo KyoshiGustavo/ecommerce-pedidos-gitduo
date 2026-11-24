@@ -1,8 +1,11 @@
 package com.senai.ecommerce.modelo;
 
+import com.senai.ecommerce.util.Validador;
+
 public class Cliente extends Pessoa {
     private String email;
 
+    // Ordem dos parâmetros: nome, documento, e-mail
     public Cliente(String nome, String documento, String email) {
         super(nome, documento);
         setEmail(email);
@@ -13,10 +16,7 @@ public class Cliente extends Pessoa {
     }
 
     public void setEmail(String email) {
-        if (email == null || !email.contains("@")) {
-            throw new IllegalArgumentException("E-mail inválido.");
-        }
-        this.email = email.trim();
+        this.email = Validador.emailValido(email);
     }
 
     @Override

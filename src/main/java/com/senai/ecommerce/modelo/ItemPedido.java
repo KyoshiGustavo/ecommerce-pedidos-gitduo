@@ -1,5 +1,6 @@
 package com.senai.ecommerce.modelo;
 
+import com.senai.ecommerce.util.Validador;
 import java.math.BigDecimal;
 
 public class ItemPedido {
@@ -8,10 +9,7 @@ public class ItemPedido {
     private BigDecimal precoPraticado;
 
     public ItemPedido(Produto produto, int quantidade) {
-        if (produto == null) {
-            throw new IllegalArgumentException("Produto é obrigatório.");
-        }
-        this.produto = produto;
+        this.produto = Validador.naoNulo(produto, "Produto");
         setQuantidade(quantidade);
         this.precoPraticado = produto.getPreco();
     }
@@ -25,10 +23,7 @@ public class ItemPedido {
     }
 
     public void setQuantidade(int quantidade) {
-        if (quantidade <= 0) {
-            throw new IllegalArgumentException("Quantidade do item deve ser maior que zero.");
-        }
-        this.quantidade = quantidade;
+        this.quantidade = Validador.quantidadePositiva(quantidade, "Quantidade do item");
     }
 
     public BigDecimal getPrecoPraticado() {
