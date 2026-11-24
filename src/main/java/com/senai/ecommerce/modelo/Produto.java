@@ -1,6 +1,7 @@
 package com.senai.ecommerce.modelo;
 
 import com.senai.ecommerce.excecao.EstoqueInsuficienteException;
+import com.senai.ecommerce.util.Mensagens;
 import com.senai.ecommerce.util.Validador;
 import java.math.BigDecimal;
 
@@ -42,6 +43,11 @@ public class Produto {
 
     public void reporEstoque(int quantidade) {
         Validador.quantidadePositiva(quantidade, "Quantidade a repor");
+        int capacidadeRestante = Integer.MAX_VALUE - this.quantidadeEmEstoque;
+        if (quantidade > capacidadeRestante) {
+            throw new IllegalArgumentException(
+                    String.format(Mensagens.REPOSICAO_EXCEDE_LIMITE, quantidade, capacidadeRestante));
+        }
         this.quantidadeEmEstoque += quantidade;
     }
 

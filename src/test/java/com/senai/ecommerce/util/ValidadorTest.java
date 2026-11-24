@@ -42,9 +42,10 @@ class ValidadorTest {
 
     @Test
     @DisplayName("Mensagem de erro deve informar o valor recebido e o esperado")
-    void mensagemDeveInformarRecebidoEEsperado() {
+    void deveInformarRecebidoEEsperadoQuandoEmailInvalido() {
         IllegalArgumentException erro = assertThrows(IllegalArgumentException.class,
             () -> Validador.emailValido("ana.email.com"));
+
         assertAll(
             () -> assertTrue(erro.getMessage().contains("ana.email.com")),
             () -> assertTrue(erro.getMessage().contains("nome@dominio.com"))

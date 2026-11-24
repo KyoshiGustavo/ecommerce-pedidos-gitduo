@@ -9,6 +9,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
 
@@ -43,24 +46,61 @@ class PedidoTest {
         @DisplayName("Deve calcular o valor total corretamente ao adicionar itens")
         void deveSomarTotalComDoisItens() throws Exception {
             Pedido pedido = criarPedidoComDoisItens();
-            assertEquals(0, new BigDecimal("3200.00").compareTo(pedido.getTotal()));
+
+            BigDecimal total = pedido.getTotal();
+
+            assertEquals(0, new BigDecimal("3200.00").compareTo(total));
+        }
+
+        @Test
+        @DisplayName("Deve usar o preço unitário quando o pedido tem um item incluído sem quantidade")
+        void deveCalcularTotalComUmItem() throws Exception {
+            Pedido pedido = new Pedido(1, cliente);
+
+            pedido.adicionarItem(mouse);
+
+            assertEquals(0, mouse.getPreco().compareTo(pedido.getTotal()));
+        }
+
+        @Test
+        @DisplayName("Deve ter total zero quando o pedido está vazio")
+        void deveCalcularTotalZeroQuandoPedidoVazio() {
+            Pedido pedido = new Pedido(1, cliente);
+
+            BigDecimal total = pedido.getTotal();
+
+            assertEquals(0, BigDecimal.ZERO.compareTo(total));
         }
 
         @Test
         @DisplayName("Deve recusar pagamento se o pedido estiver sem itens e manter o pedido ABERTO")
         void deveRecusarPagamentoDePedidoSemItens() {
             Pedido pedidoVazio = new Pedido(2, cliente);
-            assertThrows(PedidoInvalidoException.class, () -> pedidoVazio.pagar(new Pix()));
-            assertEquals("ABERTO", pedidoVazio.getStatus());
+            PedidoInvalidoException erro = assertThrows(PedidoInvalidoException.class,
+                () -> pedidoVazio.pagar(new Pix()));
+
+            assertAll(
+                () -> assertEquals(pedidoVazio.getNumero(), erro.getNumeroPedido()),
+                () -> assertEquals("ABERTO", pedidoVazio.getStatus()),
+                () -> assertNull(pedidoVazio.getComprovante())
+            );
         }
 
         @Test
         @DisplayName("Deve lançar EstoqueInsuficienteException sem alterar estoque nem itens")
         void deveManterEstadoQuandoEstoqueInsuficiente() {
             Pedido pedido = new Pedido(3, cliente);
-            assertThrows(EstoqueInsuficienteException.class, () -> pedido.adicionarItem(notebook, 50));
-            assertEquals(10, notebook.getQuantidadeEmEstoque());
-            assertTrue(pedido.getItens().isEmpty());
+            Produto produtoComTresUnidades = new Produto("Notebook", new BigDecimal("3000.00"), 3);
+
+            EstoqueInsuficienteException erro = assertThrows(EstoqueInsuficienteException.class,
+                () -> pedido.adicionarItem(produtoComTresUnidades, 50));
+
+            assertAll(
+                () -> assertEquals(50, erro.getQuantidadeSolicitada()),
+                () -> assertEquals(3, erro.getQuantidadeDisponivel()),
+                () -> assertEquals(3, produtoComTresUnidades.getQuantidadeEmEstoque()),
+                () -> assertEquals(0, BigDecimal.ZERO.compareTo(pedido.getTotal()))
+            );
         }
 
         @Test
@@ -68,12 +108,15 @@ class PedidoTest {
         void deveSomarQuantidadeDeProdutoRepetido() throws Exception {
             Pedido pedido = new Pedido(5, cliente);
             pedido.adicionarItem(mouse, 2);
+
             pedido.adicionarItem(mouse, 3);
 
-            assertEquals(1, pedido.getItens().size());
-            assertEquals(5, pedido.getItens().get(0).getQuantidade());
-            assertEquals(15, mouse.getQuantidadeEmEstoque());
-            assertEquals(0, new BigDecimal("500.00").compareTo(pedido.getTotal()));
+            assertAll(
+                () -> assertEquals(1, pedido.getItens().size(), "O pedido reúne o produto em um item"),
+                () -> assertEquals(5, pedido.getItens().get(0).getQuantidade()),
+                () -> assertEquals(15, mouse.getQuantidadeEmEstoque()),
+                () -> assertEquals(0, new BigDecimal("500.00").compareTo(pedido.getTotal()))
+            );
         }
 
         @Test
@@ -81,34 +124,57 @@ class PedidoTest {
         void deveManterItemQuandoRepeticaoExcedeEstoque() throws Exception {
             Pedido pedido = new Pedido(6, cliente);
             pedido.adicionarItem(mouse, 15);
+
             assertThrows(EstoqueInsuficienteException.class, () -> pedido.adicionarItem(mouse, 10));
 
-            assertEquals(15, pedido.getItens().get(0).getQuantidade());
-            assertEquals(5, mouse.getQuantidadeEmEstoque());
+            assertAll(
+                () -> assertEquals(0, new BigDecimal("1500.00").compareTo(pedido.getTotal())),
+                () -> assertEquals(5, mouse.getQuantidadeEmEstoque())
+            );
         }
 
         @Test
-        @DisplayName("Deve recusar produto nulo e quantidade zero ou negativa")
-        void deveRecusarArgumentosInvalidos() {
+        @DisplayName("Deve recusar produto nulo e preservar o total")
+        void deveRecusarProdutoNulo() {
             Pedido pedido = new Pedido(4, cliente);
+
             assertThrows(IllegalArgumentException.class, () -> pedido.adicionarItem(null, 1));
-            assertThrows(IllegalArgumentException.class, () -> pedido.adicionarItem(mouse, 0));
-            assertThrows(IllegalArgumentException.class, () -> pedido.adicionarItem(mouse, -2));
-            assertEquals(20, mouse.getQuantidadeEmEstoque());
+
+            assertEquals(0, BigDecimal.ZERO.compareTo(pedido.getTotal()));
+        }
+
+        @ParameterizedTest
+        @ValueSource(ints = {0, -3})
+        @DisplayName("Deve recusar quantidade zero ou negativa sem alterar pedido e estoque")
+        void deveRecusarQuantidadeInvalida(int quantidade) {
+            Pedido pedido = new Pedido(4, cliente);
+
+            assertThrows(IllegalArgumentException.class, () -> pedido.adicionarItem(mouse, quantidade));
+
+            assertAll(
+                () -> assertEquals(0, BigDecimal.ZERO.compareTo(pedido.getTotal())),
+                () -> assertEquals(20, mouse.getQuantidadeEmEstoque())
+            );
+        }
+
+        @ParameterizedTest
+        @NullSource
+        @ValueSource(ints = {0, -1})
+        @DisplayName("Deve recusar construção com número de pedido inválido")
+        void deveRecusarNumeroInvalido(Integer numero) {
+            assertThrows(IllegalArgumentException.class, () -> new Pedido(numero, cliente));
         }
 
         @Test
-        @DisplayName("Deve recusar número de pedido inválido e cliente nulo")
-        void deveRecusarConstrucaoInvalida() {
-            assertThrows(IllegalArgumentException.class, () -> new Pedido(0, cliente));
-            assertThrows(IllegalArgumentException.class, () -> new Pedido(null, cliente));
+        @DisplayName("Deve recusar construção com cliente nulo")
+        void deveRecusarClienteNulo() {
             assertThrows(IllegalArgumentException.class, () -> new Pedido(1, null));
         }
     }
 
     @Nested
-    @DisplayName("Contexto: Processamento de Pagamento")
-    class ProcessamentoPagamento {
+    @DisplayName("Pedido em pagamento")
+    class Pagamento {
 
         @Test
         @DisplayName("Deve alterar status para PAGO quando o pagamento for aprovado")
@@ -116,23 +182,34 @@ class PedidoTest {
             Pedido pedido = criarPedidoComDoisItens();
             pedido.pagar(new Pix());
 
-            assertEquals("PAGO", pedido.getStatus());
+            assertAll(
+                () -> assertEquals("PAGO", pedido.getStatus()),
+                () -> assertNotNull(pedido.getComprovante())
+            );
         }
 
         @Test
         @DisplayName("Deve recusar processador nulo sem alterar a situação do pedido")
         void deveRecusarProcessadorNulo() throws Exception {
             Pedido pedido = criarPedidoComDoisItens();
+
             assertThrows(IllegalArgumentException.class, () -> pedido.pagar(null));
-            assertEquals("ABERTO", pedido.getStatus());
+
+            assertAll(
+                () -> assertEquals("ABERTO", pedido.getStatus()),
+                () -> assertNull(pedido.getComprovante())
+            );
         }
 
         @Test
         @DisplayName("Deve manter o pedido ABERTO quando o pagamento for recusado")
         void deveManterPedidoAbertoQuandoPagamentoRecusado() throws Exception {
-            Pedido pedido = criarPedidoComDoisItens(); // total R$ 3200,00
+            Pedido pedido = new Pedido(1, cliente);
+            pedido.adicionarItem(mouse, 2);
+            CartaoCredito cartao = new CartaoCredito(new BigDecimal("50.00"));
+
             PagamentoRecusadoException erro = assertThrows(PagamentoRecusadoException.class,
-                () -> pedido.pagar(new CartaoCredito(new BigDecimal("100.00"))));
+                () -> pedido.pagar(cartao));
 
             assertAll(
                 () -> assertEquals("ABERTO", pedido.getStatus()),
@@ -143,45 +220,76 @@ class PedidoTest {
         }
 
         @Test
+        @DisplayName("Deve recusar valor informado divergente sem processar o pagamento")
+        void deveRecusarValorDivergente() throws Exception {
+            Pedido pedido = new Pedido(1, cliente);
+            pedido.adicionarItem(mouse, 2);
+            Pix pix = new Pix();
+
+            PagamentoRecusadoException erro = assertThrows(PagamentoRecusadoException.class,
+                () -> pedido.pagar(pix, new BigDecimal("150.00")));
+
+            assertAll(
+                () -> assertEquals("ABERTO", pedido.getStatus()),
+                () -> assertNull(pedido.getComprovante()),
+                () -> assertNull(pix.getComprovante()),
+                () -> assertTrue(erro.getMotivo().contains("150.00"))
+            );
+        }
+
+        @Test
+        @DisplayName("Deve aceitar pagamento quando o valor informado confere com o total")
+        void deveAceitarValorCorreto() throws Exception {
+            Pedido pedido = criarPedidoComDoisItens();
+
+            boolean aprovado = pedido.pagar(new Pix(), new BigDecimal("3200.000"));
+
+            assertAll(
+                () -> assertTrue(aprovado),
+                () -> assertEquals("PAGO", pedido.getStatus())
+            );
+        }
+    }
+
+    @Nested
+    @DisplayName("Pedido já pago")
+    class PedidoPago {
+        private Pedido pedido;
+
+        @BeforeEach
+        void prepararPedidoPago() throws Exception {
+            pedido = criarPedidoComDoisItens();
+            pedido.pagar(new Pix());
+        }
+
+        @Test
         @DisplayName("Deve impedir a segunda cobrança de um pedido já pago")
         void deveImpedirPagamentoDuplicado() throws Exception {
-            Pedido pedido = criarPedidoComDoisItens();
-            pedido.pagar(new Pix());
             String comprovante = pedido.getComprovante();
+            Pix segundaForma = new Pix();
 
-            assertThrows(PedidoInvalidoException.class, () -> pedido.pagar(new Pix()));
-            assertEquals("PAGO", pedido.getStatus());
-            assertEquals(comprovante, pedido.getComprovante());
+            assertThrows(PedidoInvalidoException.class, () -> pedido.pagar(segundaForma));
+
+            assertAll(
+                () -> assertEquals("PAGO", pedido.getStatus()),
+                () -> assertEquals(comprovante, pedido.getComprovante()),
+                () -> assertNull(segundaForma.getComprovante())
+            );
         }
 
         @Test
         @DisplayName("Deve recusar adicionar item a pedido já pago sem baixar estoque")
         void deveRecusarItemEmPedidoPago() throws Exception {
-            Pedido pedido = criarPedidoComDoisItens();
-            pedido.pagar(new Pix());
             int estoqueAntes = mouse.getQuantidadeEmEstoque();
+            BigDecimal totalAntes = pedido.getTotal();
 
             PedidoInvalidoException erro = assertThrows(PedidoInvalidoException.class,
                 () -> pedido.adicionarItem(mouse, 1));
-            assertEquals(1, erro.getNumeroPedido());
-            assertEquals(estoqueAntes, mouse.getQuantidadeEmEstoque());
-        }
-
-        @Test
-        @DisplayName("Deve recusar pagamento cujo valor informado diverge do total")
-        void deveRecusarValorDivergente() throws Exception {
-            Pedido pedido = criarPedidoComDoisItens();
-            assertThrows(PagamentoRecusadoException.class,
-                () -> pedido.pagar(new Pix(), new BigDecimal("10.00")));
-            assertEquals("ABERTO", pedido.getStatus());
-        }
-
-        @Test
-        @DisplayName("Deve aceitar pagamento quando o valor informado confere com o total (caminho feliz)")
-        void deveAceitarValorCorreto() throws Exception {
-            Pedido pedido = criarPedidoComDoisItens();
-            assertTrue(pedido.pagar(new Pix(), new BigDecimal("3200.00")));
-            assertEquals("PAGO", pedido.getStatus());
+            assertAll(
+                () -> assertEquals(pedido.getNumero(), erro.getNumeroPedido()),
+                () -> assertEquals(estoqueAntes, mouse.getQuantidadeEmEstoque()),
+                () -> assertEquals(0, totalAntes.compareTo(pedido.getTotal()))
+            );
         }
     }
 }

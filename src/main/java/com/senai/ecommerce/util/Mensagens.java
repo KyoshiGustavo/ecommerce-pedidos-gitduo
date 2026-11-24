@@ -23,6 +23,8 @@ public final class Mensagens {
             "%s inválida. Recebido: %d. Informe uma quantidade maior que zero.";
     public static final String ESTOQUE_NAO_NEGATIVO =
             "%s inválido. Recebido: %d. Informe zero ou mais unidades.";
+    public static final String REPOSICAO_EXCEDE_LIMITE =
+            "Reposição excede o limite do estoque. Solicitado: %d. Reponha no máximo %d unidade(s).";
     public static final String EMAIL_INVALIDO =
             "E-mail inválido. Recebido: %s. Use o formato nome@dominio.com.";
     public static final String DOCUMENTO_INVALIDO =
