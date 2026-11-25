@@ -4,11 +4,19 @@ import com.senai.ecommerce.excecao.EstoqueInsuficienteException;
 import java.math.BigDecimal;
 
 public class Produto {
+    private final Long id;
     private String nome;
     private BigDecimal preco;
     private int quantidadeEmEstoque;
 
     public Produto(String nome, BigDecimal preco, int quantidadeEmEstoque) {
+        this(null, nome, preco, quantidadeEmEstoque);
+    }
+
+    public Produto(Long id, String nome, BigDecimal preco, int quantidadeEmEstoque) {
+        if (id != null && id <= 0) {
+            throw new IllegalArgumentException("Id do produto deve ser positivo.");
+        }
         if (nome == null || nome.isBlank()) {
             throw new IllegalArgumentException("Nome do produto é obrigatório.");
         }
@@ -18,9 +26,14 @@ public class Produto {
         if (quantidadeEmEstoque < 0) {
             throw new IllegalArgumentException("Estoque não pode ser negativo.");
         }
+        this.id = id;
         this.nome = nome;
         this.preco = preco;
         this.quantidadeEmEstoque = quantidadeEmEstoque;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getNome() {
