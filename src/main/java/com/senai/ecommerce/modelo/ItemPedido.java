@@ -3,17 +3,33 @@ package com.senai.ecommerce.modelo;
 import java.math.BigDecimal;
 
 public class ItemPedido {
-    private Produto produto;
+    private final Long id;
+    private final Produto produto;
     private int quantidade;
-    private BigDecimal precoPraticado;
+    private final BigDecimal precoPraticado;
 
     public ItemPedido(Produto produto, int quantidade) {
+        this(null, produto, quantidade, produto == null ? null : produto.getPreco());
+    }
+
+    public ItemPedido(Long id, Produto produto, int quantidade, BigDecimal precoPraticado) {
+        if (id != null && id <= 0) {
+            throw new IllegalArgumentException("Id do item deve ser positivo.");
+        }
         if (produto == null) {
             throw new IllegalArgumentException("Produto é obrigatório.");
         }
+        if (precoPraticado == null || precoPraticado.signum() <= 0) {
+            throw new IllegalArgumentException("Preço praticado deve ser maior que zero.");
+        }
+        this.id = id;
         this.produto = produto;
         setQuantidade(quantidade);
-        this.precoPraticado = produto.getPreco();
+        this.precoPraticado = precoPraticado;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public Produto getProduto() {

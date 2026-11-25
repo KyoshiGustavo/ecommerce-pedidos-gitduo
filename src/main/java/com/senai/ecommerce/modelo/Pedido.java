@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class Pedido {
+    private final Long id;
     private Integer numero;
     private Cliente cliente;
     private List<ItemPedido> itens = new ArrayList<>();
@@ -16,14 +17,36 @@ public class Pedido {
     private String comprovante;
 
     public Pedido(Integer numero, Cliente cliente) {
+        this(null, numero, cliente);
+    }
+
+    public Pedido(Long id, Integer numero, Cliente cliente) {
+        if (id != null && id <= 0) {
+            throw new IllegalArgumentException("Id do pedido deve ser positivo.");
+        }
         if (numero == null || numero <= 0) {
             throw new IllegalArgumentException("Número do pedido inválido.");
         }
         if (cliente == null) {
             throw new IllegalArgumentException("Cliente é obrigatório.");
         }
+        this.id = id;
         this.numero = numero;
         this.cliente = cliente;
+    }
+
+    /** Reconstitui dados persistidos sem baixar o estoque novamente. */
+    public static Pedido reconstituir(Long id, Integer numero, Cliente cliente,
+                                      String status, String comprovante, List<ItemPedido> itens) {
+        Pedido pedido = new Pedido(id, numero, cliente);
+        pedido.status = status;
+        pedido.comprovante = comprovante;
+        pedido.itens.addAll(itens);
+        return pedido;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public Integer getNumero() {
@@ -57,8 +80,8 @@ public class Pedido {
         if (quantidade <= 0) {
             throw new IllegalArgumentException("Quantidade deve ser maior que zero.");
         }
-        if ("PAGO".equals(this.status)) {
-            throw new IllegalStateException("Não é possível adicionar itens a um pedido já pago.");
+        if (!"ABERTO".equals(this.status)) {
+            throw new IllegalStateException("Não é possível adicionar itens a um pedido finalizado ou pago.");
         }
 
         produto.baixarEstoque(quantidade);
